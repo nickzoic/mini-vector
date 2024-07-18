@@ -1,19 +1,8 @@
 from machine import I2S
 from machine import Pin
 from struct import pack
-
-points = [
-        (0.0, 0.0),
-        (0.0, 1.0),
-        (0.25, 1.0),
-        (0.75, 0.5),
-        (0.75, 1.0),
-        (1.0, 1.0),
-        (1.0, 0.0),
-        (0.75, 0.0),
-        (0.25, 0.5),
-        (0.25, 0.0),
-]
+from time import time
+from characters import characters
 
 I2S_ID = 0
 SCK_PIN = 32
@@ -34,10 +23,14 @@ i2s_out = I2S(
     ibuf=BUFFER_LENGTH_IN_BYTES,
 )
 
-buffer = pack("<" + "h" * (2*len(points)), *[int(z * 0xFFFF - 0x8000) for x, y in points for z in (x,y)])
-try:
-    while True:
+    
+while True:
+    t = time()
+    points = \
+        [ ((x+0)/3, y) for x, y in characters[t//100%10] ] + \
+        [ ((x+1)/3, y) for x, y in characters[t//10%10] ] + \
+        [ ((x+2)/3, y) for x, y in characters[t%10] ]
+    buffer = pack("<" + "h" * (2*len(points)), *[int(z * 0xFFFF - 0x8000) for x, y in points for z in (x,y)])
+    while t == time():
         i2s_out.write(buffer)
-finally:
-    i2s_out.deinit()
 
