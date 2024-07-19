@@ -26,10 +26,14 @@ i2s_out = I2S(
     
 while True:
     t = time()
-    points = \
-        [ ((x+0)/3, y) for x, y in characters[t//100%10] ] + \
-        [ ((x+1)/3, y) for x, y in characters[t//10%10] ] + \
-        [ ((x+2)/3, y) for x, y in characters[t%10] ]
+    points = (
+        [ ((x+0)/3, y) for x, y in characters[t//9%3] ] +
+        [ (0.333, 0) ] +
+        [ ((x+1)/3, y) for x, y in characters[t//3%3] ] +
+        [ (0.666, 0) ] +
+        [ ((x+2)/3, y) for x, y in characters[t%3] ] +
+        [ (1, 0), (1, 0), (0.666, 0), (0.333, 0), (0, 0), (0, 0) ] 
+    )
     buffer = pack("<" + "h" * (2*len(points)), *[int(z * 0xFFFF - 0x8000) for x, y in points for z in (x,y)])
     while t == time():
         i2s_out.write(buffer)
