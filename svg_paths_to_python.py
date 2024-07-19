@@ -18,7 +18,7 @@ def path_to_points(parsed_path, interpolate=2):
     x1, y1, x2, y2 = parsed_path.boundingbox()
     prev_point = None
 
-    for segment in parsed_path:
+    for seg, segment in enumerate(parsed_path):
         ll = segment.length()
 
         # remove very small segments
@@ -32,15 +32,15 @@ def path_to_points(parsed_path, interpolate=2):
             if point != prev_point:
                 x = (point.real - x1) / (x2 - x1)
                 y = (y2 - point.imag) / (y2 - y1)
-                yield x, y
-                prev_point = point
+                yield x, y, seg+l/n
+            prev_point = point
 
 print("characters = [")
 for n, ps in enumerate(path_strings):
     #print('"' + hexlify(bytearray(int(n*255) for x, y in path_to_points(parse_path(ps)) for n in (x, y))).decode('ascii') + f'", # {n}')
     print(f"\t[ # {n}")
-    for x, y in path_to_points(parse_path(ps)):
-        print(f"\t\t({x:.3f}, {y:.3f}),")
+    for x, y, l in path_to_points(parse_path(ps)):
+        print(f"\t\t({x:.3f}, {y:.3f}), # {l:.3f}")
     print("\t],")
 
 print("]")
